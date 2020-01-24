@@ -3147,6 +3147,32 @@ label|Download Latest Version
 						//enet_host_flush(server);
 						delete p.data;
 					}
+					/*else if (str.substr(0, 2) == "/ ") {
+						if (getAdminLevel(((PlayerInfo*)(peer->data))->rawName, ((PlayerInfo*)(peer->data))->tankIDPass) == 999 || getAdminLevel(((PlayerInfo*)(peer->data))->rawName, ((PlayerInfo*)(peer->data))->tankIDPass) == 666) {
+							using namespace std::chrono;
+							string name = ((PlayerInfo*)(peer->data))->displayName;
+							GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), "`^[MOD-CHAT] `2" + ((PlayerInfo*)(peer->data))->tankIDName + "`3(`6" + ((PlayerInfo*)(peer->data))->displayName + "`3): `^" + str.substr(2, cch.length() - 2 - 1)));
+
+							for (currentPeer = server->peers;
+								currentPeer < &server->peers[server->peerCount];
+								++currentPeer)
+							{
+								if (currentPeer->state != ENET_PEER_STATE_CONNECTED)
+									continue;
+								if (!((PlayerInfo*)(currentPeer->data))->radio)
+									continue;
+								if (getAdminLevel(((PlayerInfo*)(currentPeer->data))->rawName, ((PlayerInfo*)(currentPeer->data))->tankIDPass) == 666 || getAdminLevel(((PlayerInfo*)(currentPeer->data))->rawName, ((PlayerInfo*)(currentPeer->data))->tankIDPass) == 999) {
+									ENetPacket* packet = enet_packet_create(p.data,
+										p.len,
+										ENET_PACKET_FLAG_RELIABLE);
+
+									enet_peer_send(currentPeer, 0, packet);
+
+									//enet_host_flush(server);
+								}
+							}
+							delete p.data;
+						}*/
 					else if (str == "/invis") {
 						sendConsoleMsg(peer, "`6" + str);
 						if (!pData->isGhost) {
