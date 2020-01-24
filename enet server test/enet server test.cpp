@@ -3147,7 +3147,7 @@ label|Download Latest Version
 						//enet_host_flush(server);
 						delete p.data;
 					}
-					/*else if (str.substr(0, 2) == "/ ") {
+					else if (str.substr(0, 2) == "/ ") {
 						if (getAdminLevel(((PlayerInfo*)(peer->data))->rawName, ((PlayerInfo*)(peer->data))->tankIDPass) == 999 || getAdminLevel(((PlayerInfo*)(peer->data))->rawName, ((PlayerInfo*)(peer->data))->tankIDPass) == 666) {
 							using namespace std::chrono;
 							string name = ((PlayerInfo*)(peer->data))->displayName;
@@ -3172,7 +3172,7 @@ label|Download Latest Version
 								}
 							}
 							delete p.data;
-						}*/
+						}
 					else if (str == "/invis") {
 						sendConsoleMsg(peer, "`6" + str);
 						if (!pData->isGhost) {
