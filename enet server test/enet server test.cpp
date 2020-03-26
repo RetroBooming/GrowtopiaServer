@@ -620,6 +620,15 @@ WorldInfo generateWorld(string name, int width, int height)
 	}
 	return world;
 }
+void OnConsoleMessage(ENetPeer * peer, string text)
+{
+	GamePacket p = packetEnd(appendString(appendString(createPacket(), "OnConsoleMessage"), text));
+	ENetPacket * packet = enet_packet_create(p.data,
+		p.len,
+		ENET_PACKET_FLAG_RELIABLE);
+	enet_peer_send(peer, 0, packet);
+	delete p.data;
+}
 
 class PlayerDB {
 public:
