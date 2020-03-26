@@ -792,6 +792,25 @@ void sendConsoleMsg(ENetPeer* peer, string message) {
 	enet_peer_send(peer, 0, packet);
 	delete p.data;
 }
+void OnKilled(ENetPeer* peer, int netID) {
+	GamePacket p = packetEnd(appendString(createPacket(), "OnKilled"));
+	memcpy(p.data + 8, &netID, 4);
+	ENetPacket * packet = enet_packet_create(p.data,
+		p.len,
+		ENET_PACKET_FLAG_RELIABLE);
+	enet_peer_send(peer, 0, packet);
+	delete p.data;
+}
+
+void OnSetFreezeState(ENetPeer* peer, int state, int netID) {
+	GamePacket p = packetEnd(appendInt(appendString(createPacket(), "OnSetFreezeState"), state));
+	memcpy(p.data + 8, &netID, 4);
+	ENetPacket* packet = enet_packet_create(p.data,
+		p.len,
+		ENET_PACKET_FLAG_RELIABLE);
+	enet_peer_send(peer, 0, packet);
+	delete p.data;
+}
 
 string getStrUpper(string txt) {
 	string ret;
@@ -1795,6 +1814,44 @@ void SendPacketRaw(int a1, void *packetData, size_t packetDataSize, void *a4, EN
 			//cout << "Tile update at: " << data2->punchX << "x" << data2->punchY << endl;
 		}
 	}
+	void playerRespawn(ENetPeer* peer, bool isDeadByTile) {
+	int netID = ((PlayerInfo*)(peer->data))->netID;
+	if (isDeadByTile == false) {
+		OnKilled(peer, ((PlayerInfo*)(peer->data))->netID);
+	}
+	GamePacket p2x = packetEnd(appendInt(appendString(createPacket(), "OnSetFreezeState"), 0));
+	memcpy(p2x.data + 8, &netID, 4);
+	int respawnTimeout = 2000;
+	int deathFlag = 0x19;
+	memcpy(p2x.data + 24, &respawnTimeout, 4);
+	memcpy(p2x.data + 56, &deathFlag, 4);
+	ENetPacket* packet2x = enet_packet_create(p2x.data,
+		p2x.len,
+		ENET_PACKET_FLAG_RELIABLE);
+	enet_peer_send(peer, 0, packet2x);
+	delete p2x.data;
+	OnSetFreezeState(peer, 2, netID);
+	GamePacket p2 = packetEnd(appendFloat(appendString(createPacket(), "OnSetPos"), ((PlayerInfo*)(peer->data))->respawnX, ((PlayerInfo*)(peer->data))->respawnY));
+	memcpy(p2.data + 8, &(((PlayerInfo*)(peer->data))->netID), 4);
+	respawnTimeout = 2000;	
+	memcpy(p2.data + 24, &respawnTimeout, 4);
+	memcpy(p2.data + 56, &deathFlag, 4);
+	ENetPacket* packet2 = enet_packet_create(p2.data,
+		p2.len,
+		ENET_PACKET_FLAG_RELIABLE);
+	enet_peer_send(peer, 0, packet2);
+	delete p2.data;
+	GamePacket p2a = packetEnd(appendString(appendString(createPacket(), "OnPlayPositioned"), "audio/teleport.wav"));
+	memcpy(p2a.data + 8, &netID, 4);
+	respawnTimeout = 2000;
+	memcpy(p2a.data + 24, &respawnTimeout, 4);
+	memcpy(p2a.data + 56, &deathFlag, 4);
+	ENetPacket* packet2a = enet_packet_create(p2a.data,
+		p2a.len,
+		ENET_PACKET_FLAG_RELIABLE);
+	enet_peer_send(peer, 0, packet2a);
+	delete p2a.data;
+	}
 
 	void sendPlayerLeave(ENetPeer* peer, PlayerInfo* player)
 	{
@@ -2115,6 +2172,7 @@ void SendPacketRaw(int a1, void *packetData, size_t packetDataSize, void *a4, EN
 		delete data;
 
 	}
+
 
 	void sendAction(ENetPeer* peer, int netID, string action)
 	{
