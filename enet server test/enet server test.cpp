@@ -132,7 +132,31 @@ string hashPassword(string password) {
 }
 
 /***bcrypt**/
+void loadGazette(string path) {
+	std::ifstream ifff(path);
+	json j9;
+	ifff >> j9;
 
+	string news;
+	news == j9["news"].get<string>();
+}
+
+void sendGazette(ENetPeer* peer) {
+
+	std::ifstream ifff("gazette.json");
+	json j;
+	ifff >> j;
+	string news;
+	news == j["news"].get<string>();
+
+	GamePacket p8 = packetEnd(appendString(appendString(createPacket(), "OnDialogRequest"), news));
+	ENetPacket* packet8 = enet_packet_create(p8.data,
+		p8.len,
+		ENET_PACKET_FLAG_RELIABLE);
+	enet_peer_send(peer, 0, packet8);
+	delete p8.data;
+	
+}
 void sendData(ENetPeer* peer, int num, char* data, int len)
 {
 	/* Create a reliable packet of size 7 containing "packet\0" */
@@ -2893,6 +2917,10 @@ label|Download Latest Version
 							data.netID = ((PlayerInfo*)(peer->data))->netID;
 							data.plantingTree = 0xFF;
 							SendPacketRaw(4, packPlayerMoving(&data), 56, 0, peer, ENET_PACKET_FLAG_RELIABLE);*/
+					}
+					else if (str == "/news" || str == "/gazette")
+					{
+						sendGazette(peer);
 					}
 					else if (str.substr(0, 7) == "/state ")
 					{
